@@ -29,11 +29,9 @@ public class ResetPasswordController {
             if (expirationDate.after(new Date())) {
                 model.addAttribute("user", user);
                 model.addAttribute("resetPasswordToken", resetPasswordToken);
-
                 model.addAttribute("view", "user/resetpassword");
 
                 return "base-layout";
-//                return "/user/resetpassword";
             }
         }
         return "/error/usererror";
@@ -43,18 +41,12 @@ public class ResetPasswordController {
     public String resetPassword( @RequestParam(value = "_key") String resetPasswordToken, @ModelAttribute User user,
                                  final Model model) {
         User userToUpdate = users.findByResetPasswordToken(resetPasswordToken);
-        String uptadedPassword = user.getPassword();
-        userToUpdate.setPassword(encryptPassword(uptadedPassword));
+        String updatedPassword = user.getPassword();
+        userToUpdate.setPassword(encryptPassword(updatedPassword));
         userToUpdate.setResetPasswordToken(null);
         userToUpdate.setResetPasswordExpires(null);
         users.save(userToUpdate);
 
-        boolean passwordChanged = true;
-        String redirectionUrl = ServletUriComponentsBuilder.fromCurrentContextPath().path("/home").build().toUriString();
-        String responseMessage = "Your password was successfully updated";
-        model.addAttribute("passwordChanged", passwordChanged);
-        model.addAttribute("redirectionUrl", redirectionUrl);
-        model.addAttribute("responseMessage", responseMessage);
         return  "redirect:/login";
     }
     private String encryptPassword(String password){
